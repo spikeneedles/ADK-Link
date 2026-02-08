@@ -45,18 +45,13 @@ const links = [
     label: 'Model Customization',
     icon: Bot,
   },
-  {
-    href: '/chat',
-    label: 'Chat',
-    icon: MessageSquare,
-  },
 ];
 
 export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col p-2">
+    <nav className="flex flex-col">
       <SidebarMenu>
         {links.map((link) => {
           const isActive = pathname === link.href;

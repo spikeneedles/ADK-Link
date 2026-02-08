@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -60,8 +59,8 @@ export function ChatInterface() {
   }
 
   return (
-    <Card className="flex-1 flex flex-col">
-      <CardContent className="flex-1 flex flex-col p-0">
+    <div className="flex-1 flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="flex-1 flex flex-col p-0">
         <ScrollArea className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {messages.map((message, index) => (
@@ -122,7 +121,7 @@ export function ChatInterface() {
             </form>
           </Form>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

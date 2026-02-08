@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 const mockFileSystem: Record<string, string[]> = {
   '/': ['src', 'package.json', 'README.md', 'next.config.ts', 'tsconfig.json'],
   '/src': ['app', 'components', 'lib', 'ai', 'hooks'],
-  '/src/app': ['layout.tsx', 'page.tsx', 'profile', 'settings', 'model-customization', 'prompt-library', 'safety-rails', 'tools', 'workflows', 'chat', 'globals.css'],
+  '/src/app': ['layout.tsx', 'page.tsx', 'profile', 'settings', 'model-customization', 'prompt-library', 'safety-rails', 'tools', 'workflows', 'globals.css'],
   '/src/components': ['app', 'ui', 'logo.tsx', 'providers.tsx', 'app-shell.tsx'],
   '/src/components/app': ['main-nav.tsx', 'model-customization-form.tsx', 'prompt-suggester.tsx', 'safety-rails-form.tsx', 'file-navigator.tsx', 'chat-interface.tsx'],
   '/src/components/ui': ['button.tsx', 'card.tsx', 'dialog.tsx', 'input.tsx', 'label.tsx', 'sidebar.tsx'],
@@ -31,7 +31,6 @@ const mockFileSystem: Record<string, string[]> = {
   '/src/app/safety-rails': ['page.tsx'],
   '/src/app/tools': ['page.tsx'],
   '/src/app/workflows': ['page.tsx'],
-  '/src/app/chat': ['page.tsx'],
 };
 
 export function FileNavigator() {

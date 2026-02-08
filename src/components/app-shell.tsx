@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Sidebar,
@@ -17,12 +17,12 @@ import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { FileNavigator } from './app/file-navigator';
+import { ChatInterface } from './app/chat-interface';
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const settingsActive = pathname === '/settings';
   const profileActive = pathname === '/profile';
-  const chatActive = pathname === '/chat';
 
   return (
     <>
@@ -30,8 +30,18 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <SidebarHeader>
           <Logo />
         </SidebarHeader>
-        <SidebarContent>
-          <MainNav />
+        <SidebarContent className="flex flex-col p-0">
+          <div className="p-2">
+            <MainNav />
+          </div>
+          <Separator className="my-0" />
+          <div className="flex-1 flex flex-col min-h-0 p-2 gap-2">
+            <h3 className="px-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <MessageSquare className="w-4 h-4" />
+              <span>Gemini Chat</span>
+            </h3>
+            <ChatInterface />
+          </div>
         </SidebarContent>
         <SidebarFooter className="flex flex-col gap-2">
           <Separator className="my-1" />
