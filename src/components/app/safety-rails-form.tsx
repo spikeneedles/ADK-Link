@@ -24,10 +24,10 @@ import { cn } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 
 const safetyLevels = [
-  { id: "fairness", label: "Fairness" },
-  { id: "privacy", label: "Privacy" },
-  { id: "security", label: "Security" },
-  { id: "profanity-filter", label: "Profanity Filter" },
+  { id: "harassment", label: "Harassment" },
+  { id: "hate-speech", label: "Hate Speech" },
+  { id: "sexually-explicit", label: "Sexually Explicit" },
+  { id: "dangerous", label: "Dangerous" },
   { id: "fact-checking", label: "Fact Checking" },
 ] as const;
 
@@ -67,10 +67,10 @@ export function SafetyRailsForm() {
     defaultValues: {
       applicationDescription: "",
       desiredSafetyLevels: {
-        fairness: 0,
-        privacy: 0,
-        security: 0,
-        "profanity-filter": 0,
+        harassment: 0,
+        "hate-speech": 0,
+        "sexually-explicit": 0,
+        dangerous: 0,
         "fact-checking": 0,
       },
     },
