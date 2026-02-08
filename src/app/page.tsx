@@ -3,7 +3,7 @@
 import { useIDEConnection } from '@/components/providers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, GanttChartSquare, LayoutDashboard, Library, Plug, ShieldCheck, Unplug, Workflow } from 'lucide-react';
+import { Bot, GanttChartSquare, Library, Plug, ShieldCheck, Unplug, Workflow } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
