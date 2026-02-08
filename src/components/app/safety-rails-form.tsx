@@ -20,9 +20,8 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Code, Copy, LoaderCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
 import { cn } from "@/lib/utils";
+import { Slider } from "../ui/slider";
 
 const safetyLevels = [
   { id: "fairness", label: "Fairness" },
@@ -56,28 +55,6 @@ type FormValues = z.infer<typeof formSchema>;
 type SafetyRailsOutput = {
   safetyRailsCode: string;
   explanation: string;
-}
-
-function SafetySlider({ idPrefix, value, onChange }: { idPrefix: string, value: number; onChange: (value: number) => void }) {
-  return (
-    <RadioGroup
-      value={String(value)}
-      onValueChange={(val) => onChange(parseInt(val, 10))}
-      className="safety-slider"
-    >
-      <div className="safety-slider-track" />
-      {sliderLevels.map((level) => (
-        <div key={level.value} className="safety-slider-item">
-            <FormControl>
-                <RadioGroupItem value={String(level.value)} id={`${idPrefix}-${level.value}`} className="safety-slider-radio"/>
-            </FormControl>
-            <Label htmlFor={`${idPrefix}-${level.value}`} className="safety-slider-label">
-                {level.label}
-            </Label>
-        </div>
-      ))}
-    </RadioGroup>
-  );
 }
 
 export function SafetyRailsForm() {
@@ -176,7 +153,7 @@ export function SafetyRailsForm() {
                 Adjust the blocking level for each safety category.
                 </FormDescription>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {safetyLevels.map((item) => (
                     <FormField
                         key={item.id}
@@ -185,7 +162,31 @@ export function SafetyRailsForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{item.label}</FormLabel>
-                                <SafetySlider idPrefix={item.id} value={field.value} onChange={field.onChange} />
+                                <FormControl>
+                                    <div className="grid grid-cols-1 gap-2 pt-2">
+                                        <Slider
+                                            value={[field.value]}
+                                            onValueChange={(value) => field.onChange(value[0])}
+                                            min={0}
+                                            max={4}
+                                            step={1}
+                                            className="w-full"
+                                        />
+                                        <div className="flex justify-between text-xs text-muted-foreground px-1">
+                                            {sliderLevels.map(level => (
+                                                <span 
+                                                  key={level.value}
+                                                  className={cn(
+                                                    "transition-colors",
+                                                    field.value === level.value && "text-primary font-bold"
+                                                  )}
+                                                >
+                                                  {level.label}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
