@@ -5,6 +5,7 @@ import {
   GanttChartSquare,
   LayoutDashboard,
   Library,
+  MessageSquare,
   ShieldCheck,
   Workflow,
 } from 'lucide-react';
@@ -43,6 +44,11 @@ const links = [
     href: '/model-customization',
     label: 'Model Customization',
     icon: Bot,
+  },
+  {
+    href: '/chat',
+    label: 'Chat',
+    icon: MessageSquare,
   },
 ];
 

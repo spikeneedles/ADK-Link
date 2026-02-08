@@ -11,7 +11,7 @@ import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
 import { MainNav } from '@/components/app/main-nav';
 import { Button } from './ui/button';
-import { Settings, User } from 'lucide-react';
+import { Settings, User, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
@@ -22,6 +22,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const settingsActive = pathname === '/settings';
   const profileActive = pathname === '/profile';
+  const chatActive = pathname === '/chat';
 
   return (
     <>
