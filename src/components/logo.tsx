@@ -29,20 +29,20 @@ export function Logo() {
           'p-2 rounded-lg transition-colors',
           isConnected
             ? 'bg-primary/20 group-hover:bg-primary/30'
-            : 'bg-muted group-hover:bg-muted/80'
+            : 'bg-destructive/20 group-hover:bg-destructive/30'
         )}
       >
         {isConnected ? (
           <Link2 className="h-6 w-6 text-primary" />
         ) : (
-          <Unplug className="h-6 w-6 text-muted-foreground" />
+          <Unplug className="h-6 w-6 text-destructive" />
         )}
       </div>
       <div>
         <h1
           className={cn(
-            'font-headline text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tighter',
-            isConnected && 'group-hover:text-primary'
+            'font-headline text-xl font-bold transition-colors tracking-tighter',
+            isConnected ? 'text-primary' : 'text-destructive'
           )}
         >
           ADK Link
@@ -50,7 +50,7 @@ export function Logo() {
         <p
           className={cn(
             'text-xs transition-colors',
-            isConnected ? 'text-primary' : 'text-muted-foreground'
+            isConnected ? 'text-primary' : 'text-destructive'
           )}
         >
           {isConnected ? 'Connected' : 'Disconnected'}
