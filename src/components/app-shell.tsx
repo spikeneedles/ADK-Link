@@ -14,8 +14,14 @@ import { Button } from './ui/button';
 import { Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from './ui/separator';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function AppShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const settingsActive = pathname === '/settings';
+  const profileActive = pathname === '/profile';
+
   return (
     <>
       <Sidebar>
@@ -27,15 +33,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="flex flex-col gap-2">
           <Separator className="my-1" />
-           <Button variant="ghost" className="w-full justify-start gap-2" asChild>
-             <Link href="#">
-                <Settings className="w-4 h-4 text-muted-foreground" />
+           <Button variant="ghost" className={cn("w-full justify-start gap-2", settingsActive && "bg-sidebar-accent text-sidebar-accent-foreground")} asChild>
+             <Link href="/settings">
+                <Settings className="w-4 h-4" />
                 <span>Settings</span>
              </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-2" asChild>
-            <Link href="#">
-              <User className="w-4 h-4 text-muted-foreground" />
+          <Button variant="ghost" className={cn("w-full justify-start gap-2", profileActive && "bg-sidebar-accent text-sidebar-accent-foreground")} asChild>
+            <Link href="/profile">
+              <User className="w-4 h-4" />
               <span>Profile</span>
             </Link>
           </Button>
