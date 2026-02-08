@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GanttChartSquare, Cpu, Database, FileJson } from 'lucide-react';
+import { GanttChartSquare, Cpu, Database, FileJson, FileCog } from 'lucide-react';
 
 const tools = [
   {
@@ -32,6 +32,21 @@ const tools = [
     icon: Database,
     title: "Mock Data Generator",
     description: "Create realistic mock data for testing and development based on your data schemas.",
+  },
+  {
+    icon: Cpu,
+    title: "Rust Code Generation",
+    description: "Generate boilerplate and utility code for Rust projects.",
+  },
+  {
+    icon: FileCog,
+    title: "File System Operations",
+    description: "Read, write, modify, move, and create files in your workspace.",
+  },
+  {
+    icon: Cpu,
+    title: "Implement Code",
+    description: "Take a description of functionality and implement it in your codebase.",
   },
 ];
 
