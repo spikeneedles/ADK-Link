@@ -7,7 +7,7 @@ export function Logo() {
       <div className="p-2 bg-primary/20 rounded-lg group-hover:bg-primary/30 transition-colors">
         <Link2 className="h-6 w-6 text-primary" />
       </div>
-      <h1 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tighter">
+      <h1 className="font-headline text-xl font-bold text-foreground group-hover:text-primary transition-colors tracking-tighter">
         ADK Link
       </h1>
     </Link>

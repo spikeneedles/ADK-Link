@@ -8,8 +8,8 @@ export default function SafetyRailsPage() {
       <Card className="mb-8 border-0 shadow-none">
         <CardHeader className="p-0">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-red-500/10 rounded-lg">
-                <ShieldCheck className="w-8 h-8 text-red-500" />
+            <div className="p-3 bg-destructive/10 rounded-lg">
+                <ShieldCheck className="w-8 h-8 text-destructive" />
             </div>
             <div>
               <CardTitle className="text-3xl font-bold tracking-tight">AI Safety Rails</CardTitle>

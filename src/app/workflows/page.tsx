@@ -17,7 +17,7 @@ export default function WorkflowsPage() {
         <div className="flex items-center gap-4">
           <Workflow className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Workflows</h1>
+            <h1 className="font-headline text-3xl font-bold tracking-tight">Workflows</h1>
             <p className="text-muted-foreground">Visually define and implement complex AI workflows.</p>
           </div>
         </div>
@@ -25,7 +25,7 @@ export default function WorkflowsPage() {
       <div className="flex-1 grid md:grid-cols-[300px_1fr] h-[calc(100vh_-_113px)]">
         <aside className="hidden md:flex flex-col border-r">
           <div className="p-4 flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Existing Workflows</h2>
+            <h2 className="font-headline text-lg font-semibold">Existing Workflows</h2>
             <Button variant="ghost" size="sm">
               <PlusCircle className="mr-2 h-4 w-4" />
               New

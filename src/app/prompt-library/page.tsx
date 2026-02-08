@@ -49,11 +49,11 @@ export default function PromptLibraryPage() {
       
       <div className="grid lg:grid-cols-2 gap-8">
         <div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">Prompt Suggester</h2>
+            <h2 className="font-headline text-2xl font-semibold tracking-tight mb-4">Prompt Suggester</h2>
             <PromptSuggester />
         </div>
         <div>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">Pre-built Prompts</h2>
+            <h2 className="font-headline text-2xl font-semibold tracking-tight mb-4">Pre-built Prompts</h2>
             <Accordion type="single" collapsible className="w-full">
                 {promptCategories.map((category) => (
                     <AccordionItem value={category.category} key={category.category}>

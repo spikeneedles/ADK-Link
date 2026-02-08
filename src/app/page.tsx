@@ -16,7 +16,7 @@ const features = [
     title: 'Safety Rails',
     description: 'Integrate safety rails to ensure responsible AI behavior.',
     href: '/safety-rails',
-    color: 'text-red-500',
+    color: 'text-destructive',
   },
   {
     icon: Library,
@@ -45,7 +45,7 @@ export default function Home() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="font-headline text-3xl font-bold tracking-tight">Dashboard</h1>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="col-span-1 lg:col-span-3 bg-card/50 border-primary/50 shadow-lg shadow-primary/10">
@@ -54,7 +54,7 @@ export default function Home() {
             <Plug className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-400">Connected</div>
+            <div className="text-2xl font-bold text-primary">Connected</div>
             <p className="text-xs text-muted-foreground">Actively linked to Visual Studio Code</p>
           </CardContent>
         </Card>
