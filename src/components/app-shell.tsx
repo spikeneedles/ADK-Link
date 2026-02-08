@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { FileNavigator } from './app/file-navigator';
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -47,7 +48,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </Button>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        {children}
+        <FileNavigator />
+      </SidebarInset>
     </>
   );
 }
