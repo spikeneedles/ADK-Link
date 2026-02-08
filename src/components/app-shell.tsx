@@ -11,18 +11,27 @@ import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
 import { MainNav } from '@/components/app/main-nav';
 import { Button } from './ui/button';
-import { Settings, User, MessageSquare } from 'lucide-react';
+import { Settings, User, MessageSquare, Send } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { FileNavigator } from './app/file-navigator';
 import { ChatInterface } from './app/chat-interface';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const settingsActive = pathname === '/settings';
   const profileActive = pathname === '/profile';
+  const { toast } = useToast();
+
+  const handleExportClick = () => {
+    toast({
+      title: 'Changes Applied Instantly',
+      description: "This app's code is modified automatically when generated.",
+    });
+  };
 
   return (
     <>
@@ -60,6 +69,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
+        <Button onClick={handleExportClick} className="fixed top-4 right-4 z-50 shadow-lg">
+          <Send />
+          Export Changes
+        </Button>
         {children}
         <FileNavigator />
       </SidebarInset>
