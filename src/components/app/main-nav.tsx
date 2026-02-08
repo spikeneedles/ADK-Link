@@ -5,7 +5,6 @@ import {
   GanttChartSquare,
   LayoutDashboard,
   Library,
-  MessageSquare,
   ShieldCheck,
   Workflow,
 } from 'lucide-react';
