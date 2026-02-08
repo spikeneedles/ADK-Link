@@ -59,3 +59,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .safety-slider {
+    @apply relative flex items-center justify-between rounded-lg bg-muted/20 p-2;
+  }
+  .safety-slider-track {
+    @apply absolute top-1/2 left-1/2 h-0.5 w-[90%] -translate-x-1/2 -translate-y-1/2 bg-border;
+    z-index: 0;
+  }
+  .safety-slider-item {
+    @apply flex flex-col items-center gap-2 z-10 bg-background px-2;
+  }
+  .safety-slider-radio {
+    @apply h-6 w-6 border-2 bg-background transition-all;
+  }
+  .safety-slider-label {
+    @apply cursor-pointer text-xs text-muted-foreground transition-colors;
+  }
+  .safety-slider-item:hover .safety-slider-label {
+    @apply text-foreground;
+  }
+  .safety-slider-radio[data-state=checked] + .safety-slider-label {
+    @apply text-primary font-bold;
+  }
+  .safety-slider-radio[data-state=checked] {
+    @apply border-primary;
+    box-shadow: 0 0 10px 1px hsl(var(--primary) / 0.6);
+  }
+  .safety-slider-radio[data-state=checked] > span {
+    @apply flex items-center justify-center;
+  }
+  .safety-slider-radio[data-state=checked] > span > svg {
+    @apply h-3 w-3 fill-current text-primary;
+  }
+}

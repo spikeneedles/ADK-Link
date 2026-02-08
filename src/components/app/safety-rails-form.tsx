@@ -1,3 +1,4 @@
+
 "use client";
 
 import { generateAiSafetyRails } from "@/ai/flows/generate-ai-safety-rails";
@@ -15,11 +16,13 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Textarea } from "../ui/textarea";
-import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Code, Copy, LoaderCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
 
 const safetyLevels = [
   { id: "fairness", label: "Fairness" },
@@ -29,13 +32,23 @@ const safetyLevels = [
   { id: "fact-checking", label: "Fact Checking" },
 ] as const;
 
+const sliderLevels = [
+    { value: 0, label: "None" },
+    { value: 1, label: "Low" },
+    { value: 2, label: "Medium" },
+    { value: 3, label: "High" },
+    { value: 4, label: "All" },
+] as const;
+
+const safetyCategoryIds = safetyLevels.map(s => s.id);
+
 const formSchema = z.object({
   applicationDescription: z.string().min(20, "Please provide a more detailed description."),
-  desiredSafetyLevels: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one item.",
-    }),
+  desiredSafetyLevels: z.object(
+    Object.fromEntries(
+        safetyCategoryIds.map(id => [id, z.number().min(0).max(4).default(0)])
+    ) as { [key in typeof safetyCategoryIds[number]]: z.ZodNumber }
+  ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -43,6 +56,28 @@ type FormValues = z.infer<typeof formSchema>;
 type SafetyRailsOutput = {
   safetyRailsCode: string;
   explanation: string;
+}
+
+function SafetySlider({ idPrefix, value, onChange }: { idPrefix: string, value: number; onChange: (value: number) => void }) {
+  return (
+    <RadioGroup
+      value={String(value)}
+      onValueChange={(val) => onChange(parseInt(val, 10))}
+      className="safety-slider"
+    >
+      <div className="safety-slider-track" />
+      {sliderLevels.map((level) => (
+        <div key={level.value} className="safety-slider-item">
+            <FormControl>
+                <RadioGroupItem value={String(level.value)} id={`${idPrefix}-${level.value}`} className="safety-slider-radio"/>
+            </FormControl>
+            <Label htmlFor={`${idPrefix}-${level.value}`} className="safety-slider-label">
+                {level.label}
+            </Label>
+        </div>
+      ))}
+    </RadioGroup>
+  );
 }
 
 export function SafetyRailsForm() {
@@ -54,15 +89,41 @@ export function SafetyRailsForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       applicationDescription: "",
-      desiredSafetyLevels: [],
+      desiredSafetyLevels: {
+        fairness: 0,
+        privacy: 0,
+        security: 0,
+        "profanity-filter": 0,
+        "fact-checking": 0,
+      },
     },
   });
 
   async function onSubmit(values: FormValues) {
     setLoading(true);
     setResult(null);
+    
+    const levelMap: Record<number, string> = {
+        0: "None",
+        1: "Low",
+        2: "Medium",
+        3: "High",
+        4: "All",
+    };
+
+    const desiredSafetyLevels = Object.entries(values.desiredSafetyLevels)
+        .filter(([, value]) => value > 0)
+        .map(([key, value]) => {
+            const safetyLevelLabel = safetyLevels.find(s => s.id === key)?.label || key;
+            const blockLevelLabel = levelMap[value as keyof typeof levelMap];
+            return `${safetyLevelLabel}: ${blockLevelLabel}`;
+        });
+
     try {
-      const output = await generateAiSafetyRails(values);
+      const output = await generateAiSafetyRails({
+        applicationDescription: values.applicationDescription,
+        desiredSafetyLevels,
+      });
       setResult(output);
     } catch (error) {
       console.error(error);
@@ -108,56 +169,31 @@ export function SafetyRailsForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="desiredSafetyLevels"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel className="text-lg">Desired Safety Levels</FormLabel>
-                  <FormDescription>
-                    Select the safety levels you want to implement.
-                  </FormDescription>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <FormItem>
+            <div className="mb-4">
+                <FormLabel className="text-lg">Desired Safety Levels</FormLabel>
+                <FormDescription>
+                Adjust the blocking level for each safety category.
+                </FormDescription>
+            </div>
+            <div className="space-y-6">
                 {safetyLevels.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="desiredSafetyLevels"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item.id)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item.id])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== item.id
-                                      )
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
+                    <FormField
+                        key={item.id}
+                        control={form.control}
+                        name={`desiredSafetyLevels.${item.id}`}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{item.label}</FormLabel>
+                                <SafetySlider idPrefix={item.id} value={field.value} onChange={field.onChange} />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            </div>
+          </FormItem>
+
 
           <Button type="submit" disabled={loading}>
             {loading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
