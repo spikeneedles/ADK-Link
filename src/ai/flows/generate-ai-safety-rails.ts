@@ -54,7 +54,7 @@ Desired Safety Levels: {{#each desiredSafetyLevels}}{{{this}}}{{#unless @last}},
 Based on the above information, generate the code for the AI safety rails and provide an explanation of how these rails address the specified safety levels. The code should be well-documented and easy to integrate into the application.
 
 Here's an example:
-```typescript
+\\\`\`\`typescript
 // Safety rail to check for profanity in user input
 function checkForProfanity(input: string): boolean {
   const profanityList = ["badword1", "badword2", "badword3"]; // Example list
@@ -68,7 +68,7 @@ function processInput(input: string): string {
   }
   return input;
 }
-```
+\\\`\`\`
 
 Make sure to include similar Typescript code to help illustrate your approach.
 `,
