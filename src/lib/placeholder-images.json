@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "abstract-neon-1",
+      "description": "Abstract neon lights background",
+      "imageUrl": "https://images.unsplash.com/photo-1662012061995-0cd4a7ef2d12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMG5lb258ZW58MHx8fHwxNzcwNTA1NTQzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract neon"
+    },
+    {
+      "id": "abstract-neon-2",
+      "description": "Abstract blue and purple neon grid",
+      "imageUrl": "https://images.unsplash.com/photo-1764265992267-6e47c1a51023?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhYnN0cmFjdCUyMGdyaWR8ZW58MHx8fHwxNzcwNTI3OTM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract grid"
+    }
+  ]
 }
