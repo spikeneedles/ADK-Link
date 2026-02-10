@@ -7,29 +7,41 @@ import {
   SidebarHeader,
   SidebarInset,
 } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
 import { MainNav } from '@/components/app/main-nav';
 import { Button } from './ui/button';
-import { Settings, User, MessageSquare, Send } from 'lucide-react';
+import { Settings, User, MessageSquare, Send, ChevronUp, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from './ui/separator';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import { FileNavigator } from './app/file-navigator';
 import { ChatInterface } from './app/chat-interface';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 export default function AppShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const settingsActive = pathname === '/settings';
-  const profileActive = pathname === '/profile';
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleExportClick = () => {
     toast({
       title: 'Changes Applied Instantly',
       description: "This app's code is modified automatically when generated.",
+    });
+  };
+
+  const handleSignOut = () => {
+    toast({
+      title: 'Signed Out',
+      description: 'You have been signed out successfully.',
     });
   };
 
@@ -54,18 +66,32 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="flex flex-col gap-2">
           <Separator className="my-1" />
-           <Button variant="ghost" className={cn("w-full justify-start gap-2", settingsActive && "bg-sidebar-accent text-sidebar-accent-foreground")} asChild>
-             <Link href="/settings">
-                <Settings className="w-4 h-4" />
-                <span>Settings</span>
-             </Link>
-          </Button>
-          <Button variant="ghost" className={cn("w-full justify-start gap-2", profileActive && "bg-sidebar-accent text-sidebar-accent-foreground")} asChild>
-            <Link href="/profile">
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </Link>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start gap-2">
+                <User className="w-4 h-4" />
+                <span>Account</span>
+                <ChevronUp className="w-4 h-4 ml-auto" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push('/profile')}>
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')}>
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

@@ -1,0 +1,25 @@
+mutation AddLogEntry($userIdId: UUID!, $context: String, $level: String!, $message: String!, $source: String, $timestamp: Timestamp!) @auth(level: USER) {
+  logEntry_insert(data: {userIdId: $userIdId, context: $context, level: $level, message: $message, source: $source, timestamp: $timestamp})
+}
+
+query GetNotificationsForUser($userIdId: UUID!) @auth(level: USER) {
+  notifications(where: {userIdId: {eq: $userIdId}}) {
+    id
+    message
+    title
+    data
+    createdAt
+    readAt
+  }
+}
+
+mutation CreateFileMetadata($uploadedByUserIdId: UUID!, $contentType: String!, $fileName: String!, $fileSize: Int64!, $storagePath: String!) @auth(level: USER) {
+  fileMetadata_insert(data: {uploadedByUserIdId: $uploadedByUserIdId, contentType: $contentType, fileName: $fileName, fileSize: $fileSize, storagePath: $storagePath, createdAt_expr: "request.time"})
+}
+
+query GetUserSettings($userIdId: UUID!) @auth(level: USER) {
+  settings(where: {userIdId: {eq: $userIdId}}) {
+    key
+    value
+  }
+}

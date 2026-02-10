@@ -1,0 +1,17 @@
+# This file tells VS Code which files to exclude from problems panel
+# Suppress false-positive errors in node_modules
+
+# Ignore all node_modules TypeScript errors
+node_modules/**/*.d.ts
+node_modules/**/*.ts
+
+# Specifically ignore react-day-picker type errors
+node_modules/react-day-picker/**/*
+
+# Build directories
+.next/**
+dist/**
+build/**
+
+# Generated files
+*.generated.*

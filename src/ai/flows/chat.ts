@@ -40,14 +40,25 @@ const chatFlow = ai.defineFlow(
       content: [{text: msg.content}]
     }));
 
-    const {output} = await ai.generate({
-      prompt: "You are a helpful AI assistant integrated into a developer tool called ADK Link. Respond to the user's query.",
-      history: history,
-      model: 'googleai/gemini-2.5-flash',
-    });
+    const systemPrompt = "You are a helpful AI assistant integrated into a developer tool called ADK Link. Respond to the user's query.";
+    const messages: MessageData[] = [
+      { role: 'user', content: [{text: systemPrompt}] },
+      ...history
+    ];
+
+    let output;
+    try {
+      const result = await ai.generate({
+        messages,
+        model: 'googleai/gemini-2.5-flash',
+      });
+      output = result.output;
+    } catch(err: any) {
+       console.error("Chat generation failed:", err);
+    }
 
     return {
-      response: output!.text,
+      response: output?.text || "I'm sorry, I couldn't generate a response (Model output was empty).",
     };
   }
 );

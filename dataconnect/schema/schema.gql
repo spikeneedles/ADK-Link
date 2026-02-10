@@ -1,0 +1,47 @@
+type User @table {
+  firebaseUid: String!
+  createdAt: Timestamp!
+  displayName: String
+  email: String
+  photoUrl: String
+}
+
+type Setting @table {
+  key: String!
+  value: String!
+  createdAt: Timestamp!
+  userId: User
+  updatedAt: Timestamp
+}
+
+type LogEntry @table {
+  level: String!
+  message: String!
+  timestamp: Timestamp!
+  userId: User
+  context: String
+  source: String
+}
+
+type FileMetadata @table {
+  fileName: String!
+  storagePath: String!
+  fileSize: Int64!
+  contentType: String!
+  createdAt: Timestamp!
+  uploadedByUserId: User
+  downloadUrl: String
+  updatedAt: Timestamp
+}
+
+type Notification @table {
+  userId: User!
+  message: String!
+  status: String!
+  createdAt: Timestamp!
+  title: String
+  type: String
+  data: String
+  sentAt: Timestamp
+  readAt: Timestamp
+}

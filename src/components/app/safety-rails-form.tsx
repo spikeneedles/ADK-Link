@@ -43,11 +43,7 @@ const safetyCategoryIds = safetyLevels.map(s => s.id);
 
 const formSchema = z.object({
   applicationDescription: z.string().min(20, "Please provide a more detailed description."),
-  desiredSafetyLevels: z.object(
-    Object.fromEntries(
-        safetyCategoryIds.map(id => [id, z.number().min(0).max(4).default(0)])
-    ) as { [key in typeof safetyCategoryIds[number]]: z.ZodNumber }
-  ),
+  desiredSafetyLevels: z.record(z.number().min(0).max(4)),
 });
 
 type FormValues = z.infer<typeof formSchema>;

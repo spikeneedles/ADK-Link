@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { GanttChartSquare, Cpu, Database, FileJson, FileCog } from 'lucide-react';
+import { CodeGeneratorComponent } from '@/components/app/code-generator';
 
 const tools = [
   {
@@ -43,16 +44,11 @@ const tools = [
     title: "File System Operations",
     description: "Read, write, modify, move, and create files in your workspace.",
   },
-  {
-    icon: Cpu,
-    title: "Implement Code",
-    description: "Take a description of functionality and implement it in your codebase.",
-  },
 ];
 
 export default function ToolsPage() {
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-4 md:p-8 space-y-8">
         <Card className="mb-8 border-0 shadow-none">
             <CardHeader className="p-0">
             <div className="flex items-start gap-4">
@@ -62,13 +58,17 @@ export default function ToolsPage() {
                 <div>
                 <CardTitle className="text-3xl font-bold tracking-tight">Tools</CardTitle>
                 <CardDescription className="mt-2 max-w-2xl">
-                    Powerful utilities that can be implemented directly into your program to streamline development.
+                    Powerful utilities powered by Rosetta, the polyglot AI architect.
                 </CardDescription>
                 </div>
             </div>
             </CardHeader>
         </Card>
 
+      {/* Rosetta - Polyglot Code Generator */}
+      <CodeGeneratorComponent />
+
+      {/* Other Tools */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tools.map((tool, index) => (
           <Card key={index} className="flex flex-col">

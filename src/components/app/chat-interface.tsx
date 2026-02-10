@@ -11,7 +11,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/ui/avatar';
 import { Bot, LoaderCircle, Send, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { chat } from '@/ai/flows/chat';
 
 const formSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty.'),
@@ -41,21 +40,80 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage]);
     form.reset();
 
+    // Add empty assistant message that will be populated with streaming content
+    const assistantMessageIndex = messages.length + 1;
+    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+
     try {
       const history = [...messages, userMessage];
-      const assistantResponse = await chat({
-        history: history.map(m => ({ role: m.role, content: m.content })),
-      });
       
-      const assistantMessage: Message = { role: 'assistant', content: assistantResponse.response };
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Call the streaming API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: history }),
+      });
 
-    } catch (error) {
-      console.error(error);
-      const errorMessage: Message = { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' };
-      setMessages((prev) => [...prev, errorMessage]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      let accumulatedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            
+            if (data.error) {
+              throw new Error(data.error);
+            }
+            
+            if (data.content) {
+              accumulatedContent += data.content;
+              // Update the assistant message with accumulated content
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                newMessages[assistantMessageIndex] = {
+                  role: 'assistant',
+                  content: accumulatedContent,
+                };
+                return newMessages;
+              });
+            }
+          }
+        }
+      }
+
+    } catch (error: any) {
+      console.error('Chat error:', error);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        newMessages[assistantMessageIndex] = {
+          role: 'assistant',
+          content: `Sorry, I encountered an error: ${error.message}. Please try again.`,
+        };
+        return newMessages;
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

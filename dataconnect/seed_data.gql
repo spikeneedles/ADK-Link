@@ -1,0 +1,10 @@
+mutation CreateSeedData @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only populates seed data.") {
+  #  Insert seed data here, using _insertMany mutations
+  #  Example:
+  #  user_insertMany(data: [
+  #    {
+  #      id: "some-uuid",
+  #      name: "Example User"
+  #    }
+  #  ])
+}

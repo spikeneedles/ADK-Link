@@ -8,60 +8,76 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Folder, File, ArrowUp, ChevronsRight } from 'lucide-react';
-import { useState } from 'react';
+import { Folder, File, ArrowUp, ChevronsRight, Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-// This is a simplified mock of the project's file system for demonstration.
-const mockFileSystem: Record<string, string[]> = {
-  '/': ['src', 'package.json', 'README.md', 'next.config.ts', 'tsconfig.json'],
-  '/src': ['app', 'components', 'lib', 'ai', 'hooks'],
-  '/src/app': ['layout.tsx', 'page.tsx', 'profile', 'settings', 'model-customization', 'prompt-library', 'safety-rails', 'tools', 'workflows', 'globals.css'],
-  '/src/components': ['app', 'ui', 'logo.tsx', 'providers.tsx', 'app-shell.tsx'],
-  '/src/components/app': ['main-nav.tsx', 'model-customization-form.tsx', 'prompt-suggester.tsx', 'safety-rails-form.tsx', 'file-navigator.tsx', 'chat-interface.tsx'],
-  '/src/components/ui': ['button.tsx', 'card.tsx', 'dialog.tsx', 'input.tsx', 'label.tsx', 'sidebar.tsx'],
-  '/src/lib': ['utils.ts', 'placeholder-images.ts', 'placeholder-images.json'],
-  '/src/ai': ['genkit.ts', 'dev.ts', 'flows'],
-  '/src/ai/flows': ['customize-model-personality.ts', 'generate-ai-safety-rails.ts', 'suggest-prompts-from-context.ts', 'chat.ts'],
-  '/src/hooks': ['use-mobile.tsx', 'use-toast.ts'],
-  '/src/app/profile': ['page.tsx'],
-  '/src/app/settings': ['page.tsx'],
-  '/src/app/model-customization': ['page.tsx'],
-  '/src/app/prompt-library': ['page.tsx'],
-  '/src/app/safety-rails': ['page.tsx'],
-  '/src/app/tools': ['page.tsx'],
-  '/src/app/workflows': ['page.tsx'],
-};
+interface FileItem {
+  name: string;
+  isDirectory: boolean;
+}
 
 export function FileNavigator() {
-  const [currentPath, setCurrentPath] = useState('/src/app');
+  const [currentPath, setCurrentPath] = useState<string>('C:\\Users\\josht\\Downloads\\download');
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const pathParts = currentPath.split('/').filter(Boolean);
-  const filesAndFolders = mockFileSystem[currentPath] || [];
+  // Load directory contents
+  useEffect(() => {
+    const loadDirectory = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/list-directory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: currentPath }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setFiles(data.files || []);
+        }
+      } catch (error) {
+        console.error('Failed to load directory:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDirectory();
+  }, [currentPath]);
+
+  const pathParts = currentPath.split(/[/\\\\]/).filter(Boolean);
 
   const navigateUp = () => {
-    if (currentPath === '/') return;
-    const newPath = currentPath.substring(0, currentPath.lastIndexOf('/')) || '/';
-    setCurrentPath(newPath);
+    const lastSlash = Math.max(currentPath.lastIndexOf('/'), currentPath.lastIndexOf('\\'));
+    if (lastSlash <= 0) return; // Already at root
+    const newPath = currentPath.substring(0, lastSlash);
+    setCurrentPath(newPath || 'C:\\');
   };
 
   const navigateTo = (folder: string) => {
-    const newPath = currentPath === '/' ? `/${folder}` : `${currentPath}/${folder}`;
-    if (newPath in mockFileSystem) {
-      setCurrentPath(newPath);
-    }
+    const separator = currentPath.includes('\\') ? '\\' : '/';
+    const newPath = `${currentPath}${separator}${folder}`;
+    setCurrentPath(newPath);
   };
 
-  const isFolder = (name: string) => {
-    const newPath = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`;
-    return newPath in mockFileSystem;
+  const navigateToRoot = () => {
+    setCurrentPath('C:\\Users\\josht\\Downloads\\download');
   };
+
+  // Store current path in localStorage for Rosetta to use
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('workingDirectory', currentPath);
+    }
+  }, [currentPath]);
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="shadow-lg bg-background/80 backdrop-blur-sm min-w-[250px] justify-start">
+          <Button variant="outline" className="shadow-lg bg-background/80 backdrop-blur-sm min-w-[300px] justify-start">
              <div className="flex items-center gap-1.5 text-sm truncate">
                 <Folder className="w-4 h-4 text-primary shrink-0" />
                 <span className="text-muted-foreground">/</span>
@@ -74,29 +90,44 @@ export function FileNavigator() {
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="top" align="center" className="w-64 max-h-80 overflow-y-auto">
-          <DropdownMenuItem onSelect={navigateUp} disabled={currentPath === '/'}>
+        <DropdownMenuContent side="top" align="center" className="w-80 max-h-96 overflow-y-auto">
+          <div className="px-2 py-1.5 text-xs text-muted-foreground font-mono truncate">
+            {currentPath}
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={navigateToRoot}>
+            <Home className="mr-2 h-4 w-4 text-primary" />
+            <span>Project Root</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={navigateUp} disabled={currentPath === 'C:\\'}>
             <ArrowUp className="mr-2 h-4 w-4" />
-            <span>..</span>
+            <span>Parent Directory (..)</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {filesAndFolders.map((item) => {
-            const isItemFolder = isFolder(item);
-            return (
+          {isLoading ? (
+            <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+              Loading...
+            </div>
+          ) : files.length === 0 ? (
+            <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+              Empty directory
+            </div>
+          ) : (
+            files.map((item) => (
                 <DropdownMenuItem 
-                    key={item} 
-                    onSelect={isItemFolder ? () => navigateTo(item) : (e) => e.preventDefault()} 
-                    className={cn(!isItemFolder && "cursor-default focus:bg-transparent text-muted-foreground focus:text-muted-foreground")}
+                    key={item.name} 
+                    onSelect={item.isDirectory ? () => navigateTo(item.name) : undefined} 
+                    className={cn(!item.isDirectory && "cursor-default focus:bg-transparent text-muted-foreground focus:text-muted-foreground")}
                 >
-                {isItemFolder ? (
+                {item.isDirectory ? (
                     <Folder className="mr-2 h-4 w-4 text-primary" />
                 ) : (
-                    <File className="mr-2 h-4 w-4" />
+                    <File className="mr-2 h-4 w-4 text-muted-foreground" />
                 )}
-                <span>{item}</span>
+                <span>{item.name}</span>
                 </DropdownMenuItem>
-            );
-          })}
+            ))
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

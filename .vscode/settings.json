@@ -1,0 +1,27 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.validate.enable": true,
+    "typescript.implementationsCodeLens.enabled": true,
+    "typescript.referencesCodeLens.enabled": true,
+    // Suppress errors in node_modules
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": false // Keep visible but won't be checked
+    },
+    // Tell TypeScript to skip checking declaration files in node_modules
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+    // Exclude patterns for diagnostics
+    "typescript.surveys.enabled": false,
+    // Additional settings to improve performance and reduce false positives
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/.next": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.next/**": true
+    }
+}

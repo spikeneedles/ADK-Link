@@ -1,6 +1,7 @@
 "use client";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { ProjectProvider } from "@/contexts/project-context";
 import React, { createContext, useContext, useState, type ReactNode } from "react";
 
 type IDEConnectionContextType = {
@@ -26,8 +27,10 @@ export function Providers({ children }: { children: ReactNode }) {
   };
 
   return (
-    <IDEConnectionContext.Provider value={{ isConnected, toggleConnection }}>
+    <ProjectProvider>
+      <IDEConnectionContext.Provider value={{ isConnected, toggleConnection }}>
         <SidebarProvider defaultOpen>{children}</SidebarProvider>
-    </IDEConnectionContext.Provider>
+      </IDEConnectionContext.Provider>
+    </ProjectProvider>
   );
 }

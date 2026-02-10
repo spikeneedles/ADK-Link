@@ -1,0 +1,5 @@
+{
+  "block_external_data": true,
+  "rate_limit": 60,
+  "pii_redaction": true
+}
