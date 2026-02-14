@@ -1,0 +1,25 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║          🚀  DOUBLE-CLICK TO START ADK LINK  🚀               ║
+║                                                               ║
+║   Choose one of the launchers below:                          ║
+║                                                               ║
+║   ► Launch ADK Link.bat                                       ║
+║     (Shows console - good for debugging)                      ║
+║                                                               ║
+║   ► Launch ADK Link (Silent).bat                              ║
+║     (Runs in background - recommended for daily use)          ║
+║                                                               ║
+║   📌 Tip: Right-drag to desktop and select                    ║
+║      "Create shortcuts here" for quick access!                ║
+║                                                               ║
+║   📖 Full instructions: docs/INCLUDED_LAUNCHERS.md            ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+What happens when you launch:
+  1. ✅ Server starts automatically
+  2. ✅ Browser opens with ADK Link UI
+  3. ✅ Ready to use in seconds!
+
+The launchers are fully portable - they work anywhere!

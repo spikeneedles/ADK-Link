@@ -16,17 +16,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [projectPath, setProjectPath] = useState<string | null>(null);
 
-  // Load saved connection on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedPath = localStorage.getItem('connectedProjectPath');
-      if (savedPath) {
-        setProjectPath(savedPath);
-        setIsConnected(true);
-      }
-    }
-  }, []);
-
   const connectProject = (path: string) => {
     setProjectPath(path);
     setIsConnected(true);

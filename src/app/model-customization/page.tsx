@@ -1,4 +1,5 @@
 import { ModelCustomizationForm } from '@/components/app/model-customization-form';
+import { ModelProvidersSetup } from '@/components/app/model-providers-setup';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bot } from 'lucide-react';
 
@@ -14,14 +15,20 @@ export default function ModelCustomizationPage() {
             <div>
               <CardTitle className="text-3xl font-bold tracking-tight">Model Customization</CardTitle>
               <CardDescription className="mt-2 max-w-2xl">
-                Define a unique personality for your AI model. Provide a description and examples to shape its tone, style, and responses.
+                Configure model providers, API keys, and customize your AI's personality and behavior.
               </CardDescription>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      <ModelCustomizationForm />
+      <div className="space-y-8">
+        {/* Model Provider Setup */}
+        <ModelProvidersSetup />
+        
+        {/* Personality Customization */}
+        <ModelCustomizationForm />
+      </div>
     </div>
   );
 }

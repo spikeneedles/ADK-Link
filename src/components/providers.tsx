@@ -2,35 +2,21 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ProjectProvider } from "@/contexts/project-context";
-import React, { createContext, useContext, useState, type ReactNode } from "react";
-
-type IDEConnectionContextType = {
-  isConnected: boolean;
-  toggleConnection: () => void;
-};
-
-const IDEConnectionContext = createContext<IDEConnectionContextType | undefined>(undefined);
-
-export function useIDEConnection() {
-  const context = useContext(IDEConnectionContext);
-  if (context === undefined) {
-    throw new Error('useIDEConnection must be used within an IDEConnectionProvider');
-  }
-  return context;
-}
+import { useEffect } from "react";
+import { initializePathDetection } from "@/lib/path-detector";
+import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [isConnected, setIsConnected] = useState(true);
-
-  const toggleConnection = () => {
-    setIsConnected((prev) => !prev);
-  };
+  // Initialize path detection on app startup
+  useEffect(() => {
+    initializePathDetection().catch(err => {
+      console.error('[Providers] Path detection failed:', err);
+    });
+  }, []);
 
   return (
     <ProjectProvider>
-      <IDEConnectionContext.Provider value={{ isConnected, toggleConnection }}>
-        <SidebarProvider defaultOpen>{children}</SidebarProvider>
-      </IDEConnectionContext.Provider>
+      <SidebarProvider defaultOpen>{children}</SidebarProvider>
     </ProjectProvider>
   );
 }

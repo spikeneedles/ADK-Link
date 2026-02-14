@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Folder, File, ArrowUp, ChevronsRight, Home } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { useProject } from '@/contexts/project-context';
 
 interface FileItem {
   name: string;
@@ -18,12 +19,28 @@ interface FileItem {
 }
 
 export function FileNavigator() {
-  const [currentPath, setCurrentPath] = useState<string>('C:\\Users\\josht\\Downloads\\download');
+  const { isConnected, projectPath } = useProject();
+  const [currentPath, setCurrentPath] = useState<string>('');
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Initialize currentPath when project is connected
+  useEffect(() => {
+    if (isConnected && projectPath) {
+      setCurrentPath(projectPath);
+    } else {
+      setCurrentPath('');
+      setFiles([]);
+    }
+  }, [isConnected, projectPath]);
+
   // Load directory contents
   useEffect(() => {
+    if (!currentPath || !isConnected) {
+      setFiles([]);
+      return;
+    }
+
     const loadDirectory = async () => {
       setIsLoading(true);
       try {
@@ -45,15 +62,41 @@ export function FileNavigator() {
     };
 
     loadDirectory();
+  }, [currentPath, isConnected]);
+
+  // Store current path in localStorage for Link to use
+  useEffect(() => {
+    if (typeof window !== 'undefined' && currentPath) {
+      localStorage.setItem('workingDirectory', currentPath);
+    }
   }, [currentPath]);
 
+  // Don't render if not connected (this must come AFTER all hooks)
+  if (!isConnected || !projectPath || !currentPath) {
+    return null;
+  }
+
   const pathParts = currentPath.split(/[/\\\\]/).filter(Boolean);
+  const projectPathParts = projectPath.split(/[/\\\\]/).filter(Boolean);
 
   const navigateUp = () => {
+    // Normalize paths for comparison
+    const normalizedCurrent = currentPath.replace(/\\/g, '/').toLowerCase();
+    const normalizedProject = projectPath.replace(/\\/g, '/').toLowerCase();
+    
+    // Don't allow navigation above project root
+    if (normalizedCurrent === normalizedProject) return;
+    
     const lastSlash = Math.max(currentPath.lastIndexOf('/'), currentPath.lastIndexOf('\\'));
-    if (lastSlash <= 0) return; // Already at root
+    if (lastSlash <= 0) return;
+    
     const newPath = currentPath.substring(0, lastSlash);
-    setCurrentPath(newPath || 'C:\\');
+    
+    // Verify new path is still within project
+    const normalizedNew = newPath.replace(/\\/g, '/').toLowerCase();
+    if (normalizedNew.startsWith(normalizedProject)) {
+      setCurrentPath(newPath);
+    }
   };
 
   const navigateTo = (folder: string) => {
@@ -63,15 +106,11 @@ export function FileNavigator() {
   };
 
   const navigateToRoot = () => {
-    setCurrentPath('C:\\Users\\josht\\Downloads\\download');
+    setCurrentPath(projectPath);
   };
 
-  // Store current path in localStorage for Rosetta to use
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('workingDirectory', currentPath);
-    }
-  }, [currentPath]);
+  // Check if we're at project root
+  const isAtRoot = currentPath.replace(/\\/g, '/').toLowerCase() === projectPath.replace(/\\/g, '/').toLowerCase();
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
@@ -95,11 +134,11 @@ export function FileNavigator() {
             {currentPath}
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={navigateToRoot}>
+          <DropdownMenuItem onSelect={navigateToRoot} disabled={isAtRoot}>
             <Home className="mr-2 h-4 w-4 text-primary" />
             <span>Project Root</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={navigateUp} disabled={currentPath === 'C:\\'}>
+          <DropdownMenuItem onSelect={navigateUp} disabled={isAtRoot}>
             <ArrowUp className="mr-2 h-4 w-4" />
             <span>Parent Directory (..)</span>
           </DropdownMenuItem>

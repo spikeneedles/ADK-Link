@@ -1,0 +1,10 @@
+[2026-02-14T08:07:01.756Z] Error: Database connection failed
+Stack: Error: Unable to connect to PostgreSQL at localhost:5432
+    at db.connect (src/lib/database.ts:45)
+    at async initializeApp (src/app/init.ts:20)
+
+[2026-02-14T08:07:03.158Z] Error: Rate limit exceeded
+Stack: Error: Too many requests to Gemini API (15/min limit)
+    at checkRateLimit (src/middleware/rate-limit.ts:30)
+    at ai.generate (src/ai/genkit.ts:55)
+

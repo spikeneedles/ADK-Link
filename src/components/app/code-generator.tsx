@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Code2, FileCode2, Loader2, CheckCircle2 } from 'lucide-react';
+import { Code2, FileCode2, Loader2, CheckCircle2, Zap } from 'lucide-react';
 import { universalChat } from '@/ai/flows/universal-chat';
+import { ALL_TEMPLATES } from '@/ai/project-templates';
 
 const SUPPORTED_LANGUAGES = [
   { value: 'rust', label: 'Rust', icon: '🦀' },
@@ -26,6 +27,7 @@ export function CodeGeneratorComponent() {
   const [response, setResponse] = useState<string>('');
   const [filesCreated, setFilesCreated] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('auto');
 
   // Auto-load working directory from FileNavigator
   useEffect(() => {
@@ -108,7 +110,7 @@ export function CodeGeneratorComponent() {
               <Code2 className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <CardTitle>Rosetta - Polyglot Code Generator</CardTitle>
+              <CardTitle>Link - Polyglot Code Generator</CardTitle>
               <CardDescription>
                 Generate complete projects with files written directly to disk
               </CardDescription>
@@ -116,6 +118,31 @@ export function CodeGeneratorComponent() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Template Selector */}
+          <div className="space-y-2">
+            <Label htmlFor="template" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Quick Start Template
+            </Label>
+            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+              <SelectTrigger id="template">
+                <SelectValue placeholder="Auto-detect from prompt" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">⚡ Auto-detect from prompt</SelectItem>
+                {ALL_TEMPLATES.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value="none">🤖 Pure AI (no template)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Templates provide instant scaffolding. Link can customize them based on your prompt.
+            </p>
+          </div>
+
           {/* Language Selector */}
           <div className="space-y-2">
             <Label htmlFor="language">Target Language</Label>
@@ -149,11 +176,11 @@ export function CodeGeneratorComponent() {
               required
             />
             <p className="text-xs text-muted-foreground">
-              <strong>Required:</strong> Absolute path where Rosetta will create project files on disk
+              <strong>Required:</strong> Absolute path where Link will create project files on disk
             </p>
             {!projectPath && (
               <p className="text-xs text-destructive">
-                ⚠️ Project path is required for Rosetta to write files to disk
+                ⚠️ Project path is required for Link to write files to disk
               </p>
             )}
           </div>
@@ -217,7 +244,7 @@ export function CodeGeneratorComponent() {
       {response && (
         <Card>
           <CardHeader>
-            <CardTitle>Rosetta's Response</CardTitle>
+            <CardTitle>Link's Response</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm dark:prose-invert max-w-none">

@@ -105,7 +105,7 @@ export function Logo() {
       // We still can't get the absolute path for security reasons
       // But we can use the directory handle for operations
       // For now, prompt user to enter the full path
-      const userPath = prompt(`Selected folder: "${dirName}"\n\nPlease enter the full absolute path to this folder:`, `C:\\Users\\josht\\Downloads\\${dirName}`);
+      const userPath = prompt(`Selected folder: "${dirName}"\n\nPlease enter the full absolute path to this folder:\n(Example: C:\\Users\\YourName\\Desktop\\${dirName})`, '');
       
       if (userPath) {
         setSelectedPath(userPath);

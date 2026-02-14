@@ -1,9 +1,11 @@
 'use server';
 /**
- * @fileOverview Universal Chat Flow with Polyglot Code Generation
+ * @fileOverview Universal Chat Flow with Hybrid Template + AI Code Generation
  * 
- * This flow enables the AI to generate idiomatic code in multiple languages
- * and write files DIRECTLY to disk using the saveFile tool.
+ * This flow uses a hybrid approach:
+ * 1. Detects if user request matches a pre-made template
+ * 2. Uses template as starting point for fast scaffolding
+ * 3. AI customizes the template based on specific requirements
  * 
  * Supported Languages: Rust, Python, Go, Node.js, TypeScript, Next.js 15
  */
@@ -11,6 +13,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {MessageData} from 'genkit';
+import {detectTemplate, type Template} from '@/ai/project-templates';
 
 const UniversalChatInputSchema = z.object({
   history: z.array(z.object({
@@ -36,15 +39,39 @@ export async function universalChat(input: UniversalChatInput): Promise<Universa
 }
 
 /**
- * Builds the Polyglot System Prompt with THE ARCHITECT'S MANDATE
+ * Builds the Polyglot System Prompt with Template Integration
  */
-function buildPolyglotSystemPrompt(targetLanguage?: string, projectPath?: string): string {
-  const basePrompt = `You are **Rosetta**, a Principal Software Architect and expert polyglot programmer integrated into ADK Link, a developer tool for AI-assisted coding.
+function buildPolyglotSystemPrompt(
+  targetLanguage?: string, 
+  projectPath?: string,
+  template?: Template
+): string {
+  const templateContext = template ? `
+
+**🎯 TEMPLATE DETECTED: ${template.name}**
+
+I've loaded a pre-made template for you as a starting point. Here are the template files:
+
+${Object.keys(template.files).map(path => `- ${path}`).join('\n')}
+
+Your job is to:
+1. Use these template files as a base
+2. Customize them based on the user's specific requirements
+3. Add any additional files they requested
+4. Modify the template files if needed
+
+The template files are already in memory. You can return them as-is, or modify them.
+` : '';
+
+  const basePrompt = `You are **Link**, a Principal Software Architect and expert polyglot programmer integrated into ADK Link, a developer tool for AI-assisted coding.
 
 **Core Capabilities:**
 - Expert in Rust, Python, Go, Node.js, TypeScript, and Next.js 15
 - Generate idiomatic, production-ready code following language-specific conventions
 - Create complete project structures with proper configuration files
+- Use pre-made templates as starting points for faster scaffolding
+
+${templateContext}
 
 **🚨 THE ARCHITECT'S MANDATE - CRITICAL INSTRUCTIONS:**
 
@@ -124,12 +151,41 @@ const universalChatFlow = ai.defineFlow(
     outputSchema: UniversalChatOutputSchema,
   },
   async (input) => {
+    // 1. Detect if we have a matching template
+    const userPrompt = input.history[input.history.length - 1]?.content || '';
+    const detectedTemplate = detectTemplate(userPrompt);
+    
+    console.log('[UniversalChat] Detected template:', detectedTemplate?.name || 'None');
+
+    // 2. If template found, use it as the base
+    if (detectedTemplate) {
+      console.log('[UniversalChat] Using template:', detectedTemplate.id);
+      console.log('[UniversalChat] Template files:', Object.keys(detectedTemplate.files));
+      
+      // Check if user just wants the basic template without modifications
+      const isSimpleScaffold = userPrompt.toLowerCase().match(/^(create|generate|make|new|setup)\s+(a\s+)?(\w+\s+)?(nextjs|express|python|rust)\s+(app|project|cli|api|tool)(\s+project)?$/i);
+      
+      if (isSimpleScaffold) {
+        // Return template as-is for simple scaffolding requests
+        console.log('[UniversalChat] Simple scaffold detected, returning template as-is');
+        const files = Object.entries(detectedTemplate.files).map(([path, content]) => ({
+          path,
+          content
+        }));
+        
+        return {
+          response: `Created a ${detectedTemplate.name} project with ${files.length} files. ${detectedTemplate.description}. Run 'npm install' (for Node/TypeScript projects) or follow the README for setup instructions.`,
+          files
+        };
+      }
+    }
+
     const history: MessageData[] = input.history.map(msg => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       content: [{text: msg.content}]
     }));
 
-    const systemPrompt = buildPolyglotSystemPrompt(input.targetLanguage, input.projectPath);
+    const systemPrompt = buildPolyglotSystemPrompt(input.targetLanguage, input.projectPath, detectedTemplate);
 
     // Genkit 1.20.0 uses messages array, not prompt+history
     const messages: MessageData[] = [

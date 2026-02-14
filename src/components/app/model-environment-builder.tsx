@@ -23,9 +23,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useProject } from '@/contexts/project-context';
-import { universalChat } from '@/ai/flows/universal-chat';
-import { useToast } from '@/hooks/use-toast';
+import { generateSafetyRails, SafetyRailsConfig } from '@/ai/safety-rails-generator';
 import {
   Select,
   SelectContent,
@@ -60,7 +58,7 @@ interface SafetyConfig {
   piiDetection: boolean;
   dataRetention: boolean;
   auditLogging: boolean;
-  blockExternalData: boolean; // New Feature
+  blockExternalData: boolean;
   
   // Model Behavior
   temperatureLimit: number;
@@ -209,88 +207,89 @@ export function ModelEnvironmentBuilder() {
     setGeneratedFiles([]);
     
     try {
-      // Construct prompt based on config
-      const prompt = `
-Generate a comprehensive, production-ready implementation of an AI Model Environment based on this configuration:
+      // Convert config to safety rails format
+      const safetyConfig: SafetyRailsConfig = {
+        contentFiltering: config.contentFiltering,
+        harmfulContentLevel: config.harmfulContentLevel * 20, // Convert 0-5 to 0-100
+        hateSpeechLevel: config.hateSpeechLevel * 20,
+        sexualContentLevel: config.sexualContentLevel * 20,
+        violenceLevel: config.violenceLevel * 20,
+        biasMitigation: config.biasMitigation * 20,
+        
+        inputSanitization: config.inputSanitization,
+        outputValidation: config.outputValidation,
+        promptInjectionProtection: config.promptInjectionProtection,
+        jailbreakDetection: config.jailbreakDetection,
+        hallucinationDetection: config.hallucinationDetection,
+        
+        rateLimiting: config.rateLimiting,
+        requestsPerMinute: config.requestsPerMinute,
+        tokensPerRequest: config.tokensPerRequest,
+        
+        piiDetection: config.piiDetection,
+        dataRetention: config.dataRetention,
+        auditLogging: config.auditLogging,
+        gdprCompliance: true, // Always enable for best practices
+        
+        temperatureLimit: config.temperatureLimit,
+        maxContextLength: config.maxTokens,
+        blockExternalData: config.blockExternalData,
+        requireHumanReview: false,
+      };
 
---- Safety & Security Configuration ---
-1. Content Safety:
-   - Harmful Content Blocking (0-5): ${config.harmfulContentLevel}
-   - Hate Speech Blocking (0-5): ${config.hateSpeechLevel}
-   - Sexual Content Blocking (0-5): ${config.sexualContentLevel}
-   - Violence Blocking (0-5): ${config.violenceLevel}
-   - Bias Mitigation (0-5 Stubbornness): ${config.biasMitigation}
+      // Generate all safety rail files
+      console.log('[Safety Rails] Generating complete safety package...');
+      const files = generateSafetyRails(safetyConfig);
+      
+      console.log(`[Safety Rails] Generated ${Object.keys(files).length} files`);
 
-2. Security Armor:
-   - Input Sanitization: ${config.inputSanitization}
-   - Output Validation: ${config.outputValidation}
-   - Prompt Injection Protection: ${config.promptInjectionProtection}
-   - Jailbreak Detection: ${config.jailbreakDetection}
-   - Hallucination Detection: ${config.hallucinationDetection}
-   - System Prompt Lock: ${config.systemPromptLock}
+      // Create safety-rails directory
+      const safetyDir = 'safety-rails';
+      const newFiles: string[] = [];
 
-3. Rate Limits:
-   - Requests/Min: ${config.requestsPerMinute}
-   - Tokens/Request: ${config.tokensPerRequest}
-   - Temperature Limit: ${config.temperatureLimit}
-
-4. Privacy & Compliance:
-   - PII Detection/Redaction: ${config.piiDetection}
-   - Data Retention Policy: ${config.dataRetention ? 'Review & Delete' : 'Keep'}
-   - Audit Logging: ${config.auditLogging}
-   - **BLOCK EXTERNAL DATA EXFILTRATION**: ${config.blockExternalData} (CRITICAL: Ensure no data leaves the environment context)
-
---- Instructions ---
-Create a robust implementation (e.g., Python class wrapper, Middleware, or Config file) that enforces these rules.
-If the project language is detectable, use it. Otherwise default to a Python 'ModelEnvironment' class.
-The implementation MUST include specific logic for 'Block External Data' if enabled (e.g., network blocking, egress filtering).
-      `;
-
-      const result = await universalChat({
-        history: [{ role: 'user', content: prompt }],
-        projectPath: projectPath,
-        // Let Rosetta infer language or default to Python for backend logic usually
-        targetLanguage: 'python', 
-      });
-
-      // Write files
-      if (result.files && result.files.length > 0) {
-        const newFiles = [];
-        for (const file of result.files) {
-            const fullPath = `${projectPath}\\${file.path}`;
-            const apiResponse = await fetch('/api/write-file', {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'x-project-path': projectPath
-              },
-              body: JSON.stringify({ path: fullPath, content: file.content }),
+      // Write all files to project
+      for (const [filePath, content] of Object.entries(files)) {
+        const fullPath = `${projectPath}\\${safetyDir}\\${filePath}`;
+        
+        try {
+          const apiResponse = await fetch('/api/write-file', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'x-project-path': projectPath
+            },
+            body: JSON.stringify({ path: fullPath, content }),
+          });
+          
+          if (apiResponse.ok) {
+            newFiles.push(`${safetyDir}/${filePath}`);
+            console.log(`[Safety Rails] ✓ Created ${filePath}`);
+          } else {
+            const err = await apiResponse.json();
+            console.error(`[Safety Rails] Failed to write ${filePath}:`, err);
+            toast({
+              title: "Write Failed",
+              description: `Could not create ${filePath}: ${err.message}`,
+              variant: "destructive"
             });
-            
-            if (apiResponse.ok) {
-              newFiles.push(file.path);
-            } else {
-               const err = await apiResponse.json();
-               console.error("Write error:", err);
-               toast({
-                 title: "Write Failed",
-                 description: err.message,
-                 variant: "destructive"
-               });
-            }
+          }
+        } catch (error) {
+          console.error(`[Safety Rails] Error writing ${filePath}:`, error);
         }
-        setGeneratedFiles(newFiles);
-        toast({
-          title: "Environment Generated",
-          description: `Successfully created ${newFiles.length} files in your project.`,
-        });
       }
 
+      setGeneratedFiles(newFiles);
+      
+      toast({
+        title: "✅ Safety Rails Generated!",
+        description: `Created ${newFiles.length} files in ${safetyDir}/. Your LLM now has comprehensive protection.`,
+      });
+
     } catch (error) {
-      console.error(error);
+      console.error('[Safety Rails] Generation failed:', error);
       toast({
         title: "Generation Failed",
-        description: "Could not generate model environment.",
+        description: error instanceof Error ? error.message : "Could not generate safety rails.",
         variant: "destructive"
       });
     } finally {
