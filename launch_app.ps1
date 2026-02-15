@@ -1,5 +1,15 @@
 Set-Location $PSScriptRoot
 
+$setupScript = Join-Path $PSScriptRoot "powershell-steps\03-setup-env.ps1"
+if (-not (Test-Path $setupScript)) {
+    Write-Error "Missing setup script: $setupScript"
+    Start-Sleep -Seconds 2
+    exit 1
+}
+
+Write-Host "Checking API key..." -ForegroundColor Cyan
+& $setupScript -NoPause
+
 $port = 9002
 $url = "http://localhost:$port"
 $edgePath = "msedge.exe"
